@@ -1,0 +1,23 @@
+blueprint:
+  name: Door and Window Open Notification
+  description: Send a notification when any door or window is opened.
+  domain: automation
+  input:
+    door_window_sensors:
+      name: Door and Window Sensors
+      description: List of door and window sensors to monitor.
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: [door, window]
+
+trigger:
+  platform: state
+  entity_id: !input 'door_window_sensors'
+  to: 'on'
+
+action:
+  service: notify.mobile_app
+  data:
+    message: "{{ trigger.to_state.attributes.friendly_name }} has been opened."
+    title: "Alert: Entry Point Opened"
