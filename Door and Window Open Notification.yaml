@@ -17,13 +17,12 @@ blueprint:
         target:
           device:
             integration: mobile_app
-          multiple: true
 
 trigger:
   platform: state
   entity_id: !input 'door_window_sensors'
-  from: 'off'
-  to: 'on'
+  from: 'closed'
+  to: 'open'
 
 action:
   - service: notify.notify
