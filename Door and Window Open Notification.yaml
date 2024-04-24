@@ -1,22 +1,23 @@
 blueprint:
-  name: Door and Window Open Alert for Multiple Devices
-  description: Send notifications to multiple devices when any door or window is opened.
+  name: Multi-Sensor Door/Window Alert
+  description: Send notifications to mobile devices when any door or window sensor is opened.
   domain: automation
   input:
-    notify_devices:
-      name: Notify Devices
-      description: Devices to receive notifications
-      selector:
-        target:
-          entity:
-            domain: notify
     door_window_sensors:
-      name: Door and Window Sensors
-      description: Select all door and window sensors
+      name: Door/Window Sensors
+      description: List of door and window sensors to monitor.
       selector:
         entity:
           domain: binary_sensor
-          device_class: opening
+          multiple: true
+    notify_device:
+      name: Notification Devices
+      description: Device to receive notifications.
+      selector:
+        target:
+          device:
+            integration: mobile_app
+          multiple: true
 
 trigger:
   platform: state
@@ -26,10 +27,10 @@ trigger:
 
 action:
   - service: notify.notify
-    target: !input 'notify_devices'
+    target: !input 'notify_device'
     data:
-      title: "Alert"
-      message: "{{ trigger.to_state.attributes.friendly_name }} is opened!"
-      data:
-        tag: "door_window_open"
-        priority: "high"
+      message: >
+        "{{ state_attr(trigger.to_state.entity_id, 'friendly_name') }} has been opened!"
+
+mode: parallel
+max: 10
